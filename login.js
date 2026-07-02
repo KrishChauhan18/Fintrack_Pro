@@ -1,30 +1,25 @@
-let username = document.querySelector("#username");
-let password = document.querySelector("#password");
-let form = document.querySelector("#form");
+const usernameInput = document.querySelector("#username");
+const passwordInput = document.querySelector("#password");
+const loginForm = document.querySelector("#form");
 
-form.addEventListener("submit", (e) => {
+loginForm.addEventListener("submit", (e) => {
     e.preventDefault();
 
-    let user_info = JSON.parse(localStorage.getItem("users")) || [];
+    let registeredUsers = JSON.parse(localStorage.getItem("users")) || [];
 
-    // Check if username already exists
-    const user = user_info.find(obj => obj.name === username.value);
+    const validUser = registeredUsers.find(
+        user => user.name === usernameInput.value && user.pass === passwordInput.value
+    );
 
-    if (user) {
-        alert("Username already exists!");
-        return;
+    if (validUser) {
+        alert("Login Successful! Welcome to FinTrack Pro.");
+        
+        // This MUST be saved exactly like this as a simple string
+        localStorage.setItem("currentUser", validUser.name);
+        
+        // Use replace to prevent history tracking loops
+        window.location.replace("./main.html");
+    } else {
+        alert("Invalid username or password. Please try again.");
     }
-
-    user_info.push({
-        name: username.value,
-        pass: password.value
-    });
-
-    localStorage.setItem("users", JSON.stringify(user_info));
-
-    alert("Registration Successful!");
-
-    form.reset();
-
-    window.location.href = "main.html";
 });
