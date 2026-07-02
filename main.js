@@ -1,8 +1,5 @@
 import { updateChart } from "./chart.js";
 
-// ==========================================
-// DOM SELECTORS
-// ==========================================
 const addBtn = document.querySelector("#add_trans button"); 
 const modal = document.querySelector("#transactionModal");
 const closeBtn = document.querySelector("#closeModal");
@@ -10,6 +7,8 @@ const form = document.querySelector("#transactionForm");
 const themeCheckbox = document.querySelector("#themeToggleCheckbox");
 const tableBody = document.querySelector("#transactionsTableBody");
 const resetBtn = document.querySelector("#resetDataBtn");
+const logoutBtn = document.querySelector("#logout"); 
+const usernameShow = document.querySelector("#usernameshow"); 
 
 const searchInput = document.querySelector("#searchInput");
 const filterSelect = document.querySelector("#filterSelect");
@@ -19,15 +18,29 @@ const incomeDisplay = document.querySelector("#second-h");
 const expenseDisplay = document.querySelector("#third-h");
 const countDisplay = document.querySelector("#fourth-h");
 
+const activeUser = localStorage.getItem("currentUser");
+if (!activeUser) {
+    window.location.href = "login.html";
+}
 
 let transactions = JSON.parse(localStorage.getItem("fintrack_data")) || [];
 
+if (usernameShow && activeUser) {
+    usernameShow.innerHTML = `<h3 style="font-size:15px; font-weight:500; color:#9CA3AF;">Welcome, <span style="color:white; font-weight:700;">${activeUser}</span></h3>`;
+}
+
+if (logoutBtn) {
+    logoutBtn.addEventListener("click", () => {
+        localStorage.removeItem("currentUser"); 
+        window.location.href = "login.html";    
+    });
+}
 
 themeCheckbox.addEventListener("change", () => {
     const isLightMode = !themeCheckbox.checked;
     document.body.classList.toggle("light-theme", isLightMode);
     localStorage.setItem("fintrack_theme", isLightMode ? "light" : "dark");
-    updateChart(transactions); // <-- Pass state here
+    updateChart(transactions); 
 });
 
 function initTheme() {
@@ -47,7 +60,6 @@ closeBtn.addEventListener("click", () => modal.classList.remove("active"));
 window.addEventListener("click", (e) => {
     if (e.target === modal) modal.classList.remove("active");
 });
-
 
 function updateDashboardMetrics() {
     let totalIncome = 0;
@@ -94,7 +106,6 @@ function renderTableRows(filteredData = transactions) {
     });
 }
 
-
 form.addEventListener("submit", (e) => {
     e.preventDefault();
 
@@ -114,10 +125,9 @@ form.addEventListener("submit", (e) => {
     modal.classList.remove("active"); 
     applyFilters();
     updateDashboardMetrics();
-    updateChart(transactions); // <-- Pass state here
+    updateChart(transactions); 
 });
 
-// Delete Record Handling Logic
 tableBody.addEventListener("click", (e) => {
     const targetBtn = e.target.closest(".delete-btn");
     if (!targetBtn) return;
@@ -128,9 +138,8 @@ tableBody.addEventListener("click", (e) => {
     
     applyFilters();
     updateDashboardMetrics();
-    updateChart(transactions); // <-- Pass state here
+    updateChart(transactions); 
 });
-
 
 function applyFilters() {
     const searchTerm = searchInput.value.toLowerCase().trim();
@@ -150,19 +159,17 @@ function applyFilters() {
 searchInput.addEventListener("input", applyFilters);
 filterSelect.addEventListener("change", applyFilters);
 
-// Master Reset Wiping Hook
 resetBtn.addEventListener("click", () => {
     if (confirm("Are you absolute certain you wish to wipe clean all financial data logs?")) {
         transactions = [];
         localStorage.removeItem("fintrack_data");
         applyFilters();
         updateDashboardMetrics();
-        updateChart(transactions); // <-- Pass state here
+        updateChart(transactions); 
     }
 });
-
 
 initTheme();
 updateDashboardMetrics();
 renderTableRows();
-updateChart(transactions); 
+updateChart(transactions);
