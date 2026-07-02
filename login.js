@@ -26,5 +26,5 @@ form.addEventListener("submit", (e) => {
 
     form.reset();
 
-    window.location.href = "login.html";
+    window.location.href = "main.html";
 });
